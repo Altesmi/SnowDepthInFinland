@@ -5,7 +5,7 @@ from typing import List
 
 import vlc
 
-from weather_api import foobar
+from weather_api import fmi_forecast  # FMI forecast only works in north-east Europe
 
 logger = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
@@ -24,8 +24,8 @@ def alarm_events(weather) -> List[Alarm]:  # TODO
     return [Alarm(id=1337, original_time=time.localtime(), wake_up_time=time.localtime())]
 
 
-def weather_forecast(location):
-    return foobar()
+def weather_forecast(time_stamp):
+    return fmi_forecast(time_stamp=time_stamp, location="Helsinki")
 
 
 def sound_alarm():
@@ -38,8 +38,8 @@ def sound_alarm():
 def main():
     old_events = list()
     while True:
-        weather = weather_forecast(location="Helsinki")
         now = time.localtime()
+        weather = weather_forecast(time_stamp=now)
 
         for event in alarm_events(weather):
             if event.wake_up_time >= now and event.id not in old_events:
