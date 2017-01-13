@@ -1,11 +1,12 @@
-from requests import request
-from collections import namedtuple
-import xmltodict
-from collections import OrderedDict
-import time
-import datetime
 import configparser
+import datetime
+import time
+from collections import OrderedDict
+from collections import namedtuple
+from time import mktime
 
+import xmltodict
+from requests import request
 
 config = configparser.ConfigParser()
 config.read('configs.ini')
@@ -16,6 +17,9 @@ apikey = config["fmi"]["apikey"]
 
 
 def fmi_forecast(time_stamp, location="helsinki"):
+    if isinstance(time_stamp, time.struct_time):
+        time_stamp = datetime.datetime.fromtimestamp(mktime(time_stamp))
+
     query = "http://data.fmi.fi/fmi-apikey/{apikey}/wfs".format(apikey=apikey)
     params = {
         "request": "getFeature",

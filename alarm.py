@@ -33,6 +33,8 @@ def sound_alarm():
     i = vlc.Instance()
     p = i.media_player_new(uri='http://94.23.252.14:8273/stream')
     a = p.play()
+    if a != 0:
+        logger.warning("what happen - this should be 0!!")
 
 
 def main():
