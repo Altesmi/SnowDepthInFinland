@@ -3,8 +3,9 @@ import time
 from collections import namedtuple
 from typing import List
 
-import vlc
-
+from player import play_jazz_radio
+from player import play_rock_radio
+from player import play_weather_audio_from_yle
 from weather_api import fmi_forecast  # FMI forecast only works in north-east Europe
 
 logger = logging.getLogger()
@@ -17,7 +18,7 @@ def calculate_wake_time(alarm_list, weather):
     pass
 
 
-def alarm_events(weather) -> List[Alarm]:  # TODO
+def alarm_events(weather) -> List[Alarm]:
     for event in list():
         wake_up_time = calculate_wake_time(event.time, weather)
     logger.warning("alarm_events function not yet built")
@@ -28,13 +29,21 @@ def weather_forecast(time_stamp):
     return fmi_forecast(time_stamp=time_stamp, location="Helsinki")
 
 
-def sound_alarm():
+def sound_alarm(alarm_type="jazz"):
     logger.info("Start playing music")
-    i = vlc.Instance()
-    p = i.media_player_new(uri='http://94.23.252.14:8273/stream')
-    a = p.play()
-    if a != 0:
-        logger.warning("what happen - this should be 0!!")
+
+    if alarm_type == "jazz":
+        play_jazz_radio()
+
+    elif alarm_type == "rock":
+        play_rock_radio()
+
+    elif alarm_type == "weather":
+        play_weather_audio_from_yle()
+        play_jazz_radio()
+
+    else:
+        play_jazz_radio()
 
 
 def main():
@@ -45,7 +54,10 @@ def main():
 
         for event in alarm_events(weather):
             if event.wake_up_time >= now and event.id not in old_events:
-                sound_alarm()
+                if weather.type == "interesting" or True:
+                    sound_alarm(alarm_type="weather")
+                else:
+                    sound_alarm()
                 old_events.append(event.id)
 
         time.sleep(60)

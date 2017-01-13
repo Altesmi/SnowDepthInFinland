@@ -1,11 +1,25 @@
-from requests import request
-import xmltodict
-import vlc
-from pprint import pprint
+import logging
 import time
+
+import vlc
+import xmltodict
+from requests import request
+
+logger = logging.getLogger(__name__)
+
+
+def play_url(url):
+    i = vlc.Instance()
+    p = i.media_player_new(uri=url)
+    a = p.play()
+    print(2)
+    print(a)
+    if a != 0:
+        logger.warning("what happen - this should be 0!!")
 
 def play_weather_audio_from_yle():
     # https://feeds.yle.fi/areena/v1/series/1-1257538.rss?lang=fi&downloadable=true
+    # http://developer.yle.fi/tutorial-playing-a-program/
     feed = request(url="https://feeds.yle.fi/areena/v1/series/1-1257538.rss?lang=fi&downloadable=true", method="get")
     feed_dict = xmltodict.parse(feed.text)
 
@@ -17,11 +31,12 @@ def play_weather_audio_from_yle():
     time.sleep(30)
 
 def play_jazz_radio():
-    print("Nothing but jazz")
-    vlc.MediaPlayer("http://broadcast.infomaniak.ch/jazzradio-high.mp3.m3u").play()
-    time.sleep(10)
+    logger.debug("Nothing but jazz")
+    # play_url("http://broadcast.infomaniak.ch/jazzradio-high.mp3.m3u")
+    play_url("http://94.23.252.141:8273/stream")
+    time.sleep(3)
 
 def play_rock_radio():
-    vlc.MediaPlayer("http://webradio.antennevorarlberg.at/classicrock.m3u").play()
-    print("Nothing but ROOOCCCKKKK!!!")
-    time.sleep(10)
+    logger.debug("Nothing but ROOOCCCKKKK!!!")
+    play_url("http://webradio.antennevorarlberg.at/classicrock.m3u")
+    time.sleep(3)
