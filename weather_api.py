@@ -11,7 +11,7 @@ from requests import request
 config = configparser.ConfigParser()
 config.read('configs.ini')
 
-weather = namedtuple("Weather", ("rain_amount_night low_temp_morning low_temp_day"))
+weather = namedtuple("Weather", ("rain_amount_night low_temp_morning low_temp_day type"))
 
 apikey = config["fmi"]["apikey"]
 
@@ -65,7 +65,6 @@ def fmi_forecast(time_stamp, location="helsinki"):
                     coldest = float(temp)
                     coldest_time = dtm
 
-        print(rain1, rain2)
 
     print("morning temp: ", morning_time.strftime('%Y-%m-%d %H:%M:%S'), morning_temp)
     print("coldest temp: ", coldest_time.strftime('%Y-%m-%d %H:%M:%S'), coldest)
@@ -73,7 +72,12 @@ def fmi_forecast(time_stamp, location="helsinki"):
     low_temp_morning = 0
     low_temp_day = 0
     rain_amount_night = 0
-    return weather(low_temp_morning=morning_temp, low_temp_day=coldest, rain_amount_night=rain_amount_night)
+    return weather(
+        low_temp_morning=morning_temp,
+        low_temp_day=coldest,
+        rain_amount_night=rain_amount_night,
+        type="normal"
+    )
 
 if __name__ == "__main__":
     get_weather_from_ilmatieteenlaitos(datetime.datetime.today() + datetime.timedelta(hours=12))

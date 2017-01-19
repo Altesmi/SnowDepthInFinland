@@ -12,8 +12,6 @@ def play_url(url):
     i = vlc.Instance()
     p = i.media_player_new(uri=url)
     a = p.play()
-    print(2)
-    print(a)
     if a != 0:
         logger.warning("what happen - this should be 0!!")
 
@@ -33,7 +31,8 @@ def play_weather_audio_from_yle():
 def play_jazz_radio():
     logger.debug("Nothing but jazz")
     # play_url("http://broadcast.infomaniak.ch/jazzradio-high.mp3.m3u")
-    play_url("http://94.23.252.141:8273/stream")
+    # play_url("http://94.23.252.141:8273/stream")
+    play_url("http://us2.internet-radio.com:8208")
     time.sleep(3)
 
 def play_rock_radio():
