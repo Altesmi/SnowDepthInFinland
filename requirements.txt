@@ -1,4 +1,7 @@
 python-vlc
-requests
 pytest
 apscheduler
+mock
+requests-mock
+lxml
+requests

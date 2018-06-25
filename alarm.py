@@ -33,7 +33,7 @@ def alarm_events(weather) -> List[Alarm]:
 
 
 def weather_forecast(time_stamp):
-    return fmi_forecast(time_stamp=time_stamp, location="Helsinki")
+    return fmi_forecast(location="Helsinki")
 
 
 def sound_alarm(alarm_type="jazz"):
