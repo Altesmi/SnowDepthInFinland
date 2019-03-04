@@ -26,6 +26,8 @@ class Measurement(object):
 class StationData(object):
     identifier: int
     region: str
+    lat: float
+    lon: float
     measurements: List[Measurement]
 
 
@@ -88,6 +90,7 @@ def _parse_weather_report(content: bytes):
         "observators": f".//{{{namespaces['omso']}}}PointTimeSeriesObservation",
         "observator_id": f".//{{{namespaces['gml']}}}identifier",
         "observator_region": f".//{{{namespaces['target']}}}region",
+        "observator_coordinates": f".//{{{namespaces['gml']}}}pos",
         "measurements": f".//{{{namespaces['wml2']}}}point",
         "measurement_time": f".//{{{namespaces['wml2']}}}time",
         "measurement_value": f".//{{{namespaces['wml2']}}}value",
@@ -97,9 +100,12 @@ def _parse_weather_report(content: bytes):
 
     # Parse data
     for collection_point in xml_tree.iterfind(elements["observators"]):
+        lat, lon = collection_point.findtext(elements["observator_coordinates"]).split()
         station = StationData(
             identifier=collection_point.findtext(elements["observator_id"]),
             region=collection_point.findtext(elements["observator_region"]),
+            lat=float(lat.strip()),
+            lon=float(lon.strip()),
             measurements=[]
         )
         for measurement_point in collection_point.iterfind(elements["measurements"]):
@@ -133,4 +139,5 @@ def snow_data():
 
 
 if __name__ == "__main__":
-    snow_data()
+    for x in snow_data():
+        print(x)
