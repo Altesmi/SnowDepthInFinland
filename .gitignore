@@ -90,7 +90,13 @@ ENV/
 
 # Pycharm
 idea/
+
+#configs
+configs.ini
 .idea/
 
 # Configs (api password is here)
 configs.ini
+
+#data
+*.csv

@@ -1,5 +1,7 @@
 import configparser
 import logging
+import pandas as pd
+
 from datetime import datetime
 from typing import List
 
@@ -58,7 +60,7 @@ def _make_api_request() -> models.Response:
         "storedquery_id": "fmi::observations::weather::daily::timevaluepair",
         "parameters": "snow",
         "starttime": "2018-01-24T00:00:00Z",
-        "endtime": "2018-02-24T00:00:00Z",
+        "endtime": "2018-01-25T00:00:00Z",
         "bbox": "20,60,30,70",
     }
     return request(url=query, params=params, method="get")
@@ -139,5 +141,9 @@ def snow_data():
 
 
 if __name__ == "__main__":
-    for x in snow_data():
-        print(x)
+    raw_data = snow_data()
+
+    d = pd.DataFrame(data=raw_data)
+
+    d.to_csv('test.csv')
+
