@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime
 from typing import List
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from lxml import etree
 from requests import request, models
 from requests.exceptions import RequestException
@@ -59,8 +59,8 @@ def _make_api_request() -> models.Response:
         "request": "getFeature",
         "storedquery_id": "fmi::observations::weather::daily::timevaluepair",
         "parameters": "snow",
-        "starttime": "2018-01-24T00:00:00Z",
-        "endtime": "2018-01-25T00:00:00Z",
+        "starttime": "2018-01-01T00:00:00Z",
+        "endtime": "2018-04-30T00:00:00Z",
         "bbox": "20,60,30,70",
     }
     return request(url=query, params=params, method="get")
@@ -102,7 +102,8 @@ def _parse_weather_report(content: bytes):
 
     # Parse data
     for collection_point in xml_tree.iterfind(elements["observators"]):
-        lat, lon = collection_point.findtext(elements["observator_coordinates"]).split()
+        lat, lon = collection_point.findtext(
+            elements["observator_coordinates"]).split()
         station = StationData(
             identifier=collection_point.findtext(elements["observator_id"]),
             region=collection_point.findtext(elements["observator_region"]),
@@ -110,13 +111,15 @@ def _parse_weather_report(content: bytes):
             lon=float(lon.strip()),
             measurements=[]
         )
-        for measurement_point in collection_point.iterfind(elements["measurements"]):
+        for measurement_point in collection_point.iterfind(
+                elements["measurements"]):
             data = Measurement(
                 time=datetime.strptime(
                     measurement_point.findtext(elements["measurement_time"]),
                     "%Y-%m-%dT%H:%M:%SZ"
                 ),
-                value=float(measurement_point.findtext(elements["measurement_value"]))
+                value=float(
+                    measurement_point.findtext(elements["measurement_value"]))
             )
             station.measurements.append(data)
         stations.append(station)
@@ -128,22 +131,28 @@ def snow_data():
     try:
         result = _make_api_request()
     except RequestException:
-        logger.exception("Unexpected error connecting to FMI API, see log for details")
+        logger.exception(
+            "Unexpected error connecting to FMI API, see log for details")
         raise ConnectionError("Unable to connect to FMI API")
 
     if result.ok:
         weather_data = _parse_weather_report(result.content)
     else:
         logger.error(result.content)
-        raise ConnectionRefusedError("FMI API refused connection, see log for details")
+        raise ConnectionRefusedError(
+            "FMI API refused connection, see log for details")
 
     return weather_data
 
 
 if __name__ == "__main__":
     raw_data = snow_data()
+    data = pd.DataFrame()
+    for row in raw_data:
+        row_as_dict = asdict(row)
+        station = {key: row_as_dict[key] for key in
+                   ["identifier", "region", "lat", "lon"]}
+        meas = row_as_dict["measurements"]
+        data = data.append([{**station, **x} for x in meas], ignore_index=True)
 
-    d = pd.DataFrame(data=raw_data)
-
-    d.to_csv('test.csv')
-
+    data.to_csv('test.csv')
