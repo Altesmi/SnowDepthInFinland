@@ -100,3 +100,6 @@ configs.ini
 
 #data
 *.csv
+
+#raw data
+raw_data/

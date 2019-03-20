@@ -1,6 +1,7 @@
 import configparser
 import logging
 import pandas as pd
+import numpy as np
 
 from datetime import datetime
 from typing import List
@@ -51,7 +52,7 @@ def _get_apikey() -> str:
 
 
 @timed_cache(minutes=60)
-def _make_api_request() -> models.Response:
+def _make_api_request(starttime,endtime) -> models.Response:
     logger.info("Creating new weather request to FMI")
     apikey = _get_apikey()
     query = FMI_URL.format(apikey=apikey)
@@ -59,8 +60,8 @@ def _make_api_request() -> models.Response:
         "request": "getFeature",
         "storedquery_id": "fmi::observations::weather::daily::timevaluepair",
         "parameters": "snow",
-        "starttime": "2018-01-01T00:00:00Z",
-        "endtime": "2018-04-30T00:00:00Z",
+        "starttime": starttime,
+        "endtime": endtime,
         "bbox": "20,60,30,70",
     }
     return request(url=query, params=params, method="get")
@@ -127,9 +128,9 @@ def _parse_weather_report(content: bytes):
     return stations
 
 
-def snow_data():
+def snow_data(starttime,endtime):
     try:
-        result = _make_api_request()
+        result = _make_api_request(starttime,endtime)
     except RequestException:
         logger.exception(
             "Unexpected error connecting to FMI API, see log for details")
@@ -146,13 +147,22 @@ def snow_data():
 
 
 if __name__ == "__main__":
-    raw_data = snow_data()
-    data = pd.DataFrame()
-    for row in raw_data:
-        row_as_dict = asdict(row)
-        station = {key: row_as_dict[key] for key in
-                   ["identifier", "region", "lat", "lon"]}
-        meas = row_as_dict["measurements"]
-        data = data.append([{**station, **x} for x in meas], ignore_index=True)
-
-    data.to_csv('test.csv')
+    
+    startyears = np.arange(2016,2019,1)
+    endyears = np.arange(2017,2020,1)
+    
+    for ind,sy in enumerate(startyears):
+        starttime = str(sy)+"-07-01T00:00:00Z"
+        endtime = str(endyears[ind])+"-06-30T00:00:00Z"
+        raw_data = snow_data(starttime,endtime)
+        data = pd.DataFrame()
+        
+    
+        for row in raw_data:
+            row_as_dict = asdict(row)
+            station = {key: row_as_dict[key] for key in
+                       ["identifier", "region", "lat", "lon"]}
+            meas = row_as_dict["measurements"]
+            data = data.append([{**station, **x} for x in meas], ignore_index=True)
+            filename = "raw_data/Data_" + str(sy)+".csv"
+        data.to_csv(filename)
