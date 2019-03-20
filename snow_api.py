@@ -148,13 +148,15 @@ def snow_data(starttime,endtime):
 
 if __name__ == "__main__":
     
-    startyears = np.arange(2016,2019,1)
-    endyears = np.arange(2017,2020,1)
+    startyears = np.arange(1918, 2019, 1)
+    endyears = np.arange(1919, 2020, 1)
     
-    for ind,sy in enumerate(startyears):
+    for ind, sy in enumerate(startyears):
+        strInfo = 'Fetching data for year ' + str(sy)
+        logger.info(strInfo)
         starttime = str(sy)+"-07-01T00:00:00Z"
         endtime = str(endyears[ind])+"-06-30T00:00:00Z"
-        raw_data = snow_data(starttime,endtime)
+        raw_data = snow_data(starttime, endtime)
         data = pd.DataFrame()
         
     
@@ -164,5 +166,5 @@ if __name__ == "__main__":
                        ["identifier", "region", "lat", "lon"]}
             meas = row_as_dict["measurements"]
             data = data.append([{**station, **x} for x in meas], ignore_index=True)
-            filename = "raw_data/Data_" + str(sy)+".csv"
+            filename = "raw_data/data_" + str(sy)+".csv"
         data.to_csv(filename)
