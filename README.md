@@ -1,4 +1,4 @@
-# Snow depth in Finland animimation
+# Snow depth in Finland animation
 
 Animation of how snow depth in Finland has evolved during last 100 years.
 Uses the data from Finnish Meteorological Institutes (FMI)  open database.
