@@ -165,6 +165,6 @@ if __name__ == "__main__":
             station = {key: row_as_dict[key] for key in
                        ["identifier", "region", "lat", "lon"]}
             meas = row_as_dict["measurements"]
-            data = data.append([{**station, **x} for x in meas], ignore_index=True)
+            data = data.append([{ **station, **x} for x in meas], ignore_index=True)
             filename = "raw_data/data_" + str(sy)+".csv"
         data.to_csv(filename)
