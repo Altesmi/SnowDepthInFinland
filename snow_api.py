@@ -62,7 +62,7 @@ def _make_api_request(starttime,endtime) -> models.Response:
         "parameters": "snow",
         "starttime": starttime,
         "endtime": endtime,
-        "bbox": "20,60,30,70",
+        "bbox": "15,55,45,75",
     }
     return request(url=query, params=params, method="get")
 
@@ -148,8 +148,8 @@ def snow_data(starttime,endtime):
 
 if __name__ == "__main__":
     
-    startyears = np.arange(1918, 2019, 1)
-    endyears = np.arange(1919, 2020, 1)
+    startyears = np.arange(1918, 2019)
+    endyears = np.arange(1919, 2020)
     
     for ind, sy in enumerate(startyears):
         strInfo = 'Fetching data for year ' + str(sy)

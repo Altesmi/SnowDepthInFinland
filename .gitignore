@@ -103,3 +103,11 @@ configs.ini
 
 #raw data
 raw_data/
+
+#statistic data
+statistics_data/
+
+# examples
+example*
+#matlab
+matlab/
